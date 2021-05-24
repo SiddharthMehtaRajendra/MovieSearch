@@ -55,7 +55,6 @@ def load_movielens():
     if movies:
         movie = Movie(movies)
         result = movie.load_into_db()
-        movie.index_movie_ratings()
     
     ratings = csv_reader.file_reader('ratings')
     if ratings:
@@ -71,6 +70,8 @@ def load_movielens():
     if links:
         link = Link(links)
         result = link.load_into_db()
-        
+    
+    movie = Movie()
+    movie.index_movie_ratings()
     result = "Successfully Loaded and Indexed All Data!"
     return flask.jsonify(dict(result=result, backend="python"))
