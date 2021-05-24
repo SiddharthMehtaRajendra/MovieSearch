@@ -1,0 +1,75 @@
+version: "3.7"
+
+services:
+  mysql:
+    image: mysql:8
+    container_name: sem_mysql
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_PASSWORD: testpass
+      MYSQL_ROOT_PASSWORD: testpass
+    command: --init-file /data/application/init.sql
+    volumes:
+      - ./init.sql:/data/application/init.sql
+    
+  backend:
+    build: backend-python
+    links:
+     - elasticsearch
+    environment:
+      PMA_HOST: mysql
+    depends_on:
+      - mysql
+      - elasticsearch
+    restart: always
+    volumes:
+      - ./backend-python:/app
+    stdin_open: true  # enable attach for pdb
+    tty: true
+    ports:
+      - "8080:80"
+  
+  elasticsearch: # Elasticsearch Instance
+    container_name: sem_elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.3
+    volumes: # Persist ES data in seperate "esdata" volume
+      - esdata:/usr/share/elasticsearch/data
+    networks:
+      - elastic
+    environment:
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
+      - discovery.type=single-node
+    ports: # Expose Elasticsearch ports
+      - "9300:9300"
+      - "9200:9200"
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.9.3
+    container_name: sem_kibana
+    networks:
+      - elastic
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - 5601:5601
+    depends_on:
+      - elasticsearch
+
+  site:
+    build: frontend-react
+    restart: always
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend-react:/site
+    ports:
+      - "8090:80"
+
+networks:
+  elastic:
+    driver: bridge
+
+volumes:
+  esdata:
