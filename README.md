@@ -21,7 +21,7 @@ To get the project up and running:
     d. Test Elastic Search is running using http://localhost:8090/test-es
        The hostname/port may be different for the frontend depending on your
        OS/docker setup. See the log messages from service startup.  
-5. First, start by loading the data into MySQL by making an empty (no parameters) POST request to localhost:8080/load-data. This will also index the data in Elastic Search. You may have to wait for around 15-20 minutes for everything to finish loading.
+5. First, start by loading the data into MySQL by making an empty (no parameters) POST request to http://localhost:8080/load-data. This will also index the data in Elastic Search. You may have to wait for around 15-20 minutes for everything to finish loading.
 6. After Step 5 finishes successfully, to view the home page of the application, open http://localhost:8090/. On page load, the top 10 most popular titles will be displayed.
 7. Feel free to try out searching movie titles using movie title, year or genres or view titles by their average rating.
 8. Enjoy the experience of quick searching using elastic search!
